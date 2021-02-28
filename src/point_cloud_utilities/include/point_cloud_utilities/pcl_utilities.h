@@ -209,6 +209,11 @@ namespace PCLUtilities
         return *cloud_filtered;
     }
 
+    /// <summary>
+    /// The function will down sample the point cloud of type PointT in all three dimensions.
+    /// PointT can be of type like this: PointXYZ, PointXYZI, PointXYZRGB
+    /// </summary>
+
     template<typename PointT>
     pcl::PointCloud<PointT>voxelGridFilter(pcl::PointCloud<PointT>cloudIn, const float leafX, const float leafY,const float leafZ)
     {
