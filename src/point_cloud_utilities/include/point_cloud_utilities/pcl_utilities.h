@@ -143,24 +143,6 @@ namespace PCLUtilities
         return *cloud_out_;
     }
 
-    /// <summary>
-    /// The function will down sample the point cloud of type PointT.
-    /// PointT can be of type like this: PointXYZ, PointXYZI, PointXYZRGB
-    /// </summary>
-
-
-    template<typename PointT>
-    pcl::PointCloud<PointT> downSampled(pcl::PointCloud<PointT>cloud, double leafSize)
-    {
-        pcl::PointCloud<PointT> cloud_down_sampled_;
-        pcl::VoxelGrid<PointT> voxelSampler_;
-        voxelSampler_.setInputCloud(cloud.makeShared());
-        voxelSampler_.setLeafSize(leafSize, leafSize, leafSize);
-        voxelSampler_.filter(cloud_down_sampled_);
-
-        return cloud_down_sampled_;
-
-    }
 
     template<typename PointT>
     pcl::PointCloud<PointT>outliersRemoval(pcl::PointCloud<PointT> cloud, int meanK, double standDevThresh)
