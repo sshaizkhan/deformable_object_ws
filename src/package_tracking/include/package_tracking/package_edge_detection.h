@@ -2,6 +2,10 @@
 // Created by Shahwaz Khan on 2/19/21.
 //
 
+//// This node detects the edge of the object which is at the closest distance from the origin of the realsense camera.
+//// The z-axis emerges from the lens of the camera, the y-axis always points downwards and the x-axis towards right.
+//// RIGHT HAND THUMB RULE
+
 #ifndef SRC_PACKAGE_EDGE_DETECTION_H
 #define SRC_PACKAGE_EDGE_DETECTION_H
 
