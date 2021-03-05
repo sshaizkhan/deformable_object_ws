@@ -116,7 +116,7 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
 
 void PackageTracking::pointCloudSaveCb(string &file_no_) {
 
-    PCLUtilities::savePointCloudToPLY(*final_cloud_created,file_path_, "/fileSaved" + file_no_ + ".ply");
+    PCLUtilities::savePointCloudToPLY(*final_cloud_created,file_path_, "fileSaved_" + file_no_ + ".ply");
 
 }
 
