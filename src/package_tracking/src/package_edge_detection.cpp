@@ -1,12 +1,12 @@
 //
 // Created by Shahwaz Khan on 2/19/21.
+// shahwazk@usc.edu
 //
 
 #include "package_tracking/package_edge_detection.h"
 
 PackageTracking::PackageTracking()
 {
-
     package_cloud_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/package_cloud", 1);
     cam_pointcloud_sub_ = nh_.subscribe("two/depth/color/points", 1, &PackageTracking::pointCloudInfoCb, this);
 
@@ -14,7 +14,6 @@ PackageTracking::PackageTracking()
     box_filtered_cloud_ptr_ = PointCloudT::Ptr (new PointCloudT);
 
     final_cloud_created = PointCloudT ::Ptr (new PointCloudT);
-
 
 }
 

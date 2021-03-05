@@ -33,12 +33,6 @@ public:
 
     double tolerance{};
 
-
-
-
-
-
-
 //  Camera members
 
     ros::Subscriber cam_pointcloud_sub_;
