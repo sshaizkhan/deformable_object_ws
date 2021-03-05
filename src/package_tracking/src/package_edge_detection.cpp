@@ -57,10 +57,6 @@ void PackageTracking::applyBoxFilter()
 
 void PackageTracking::cloud_processing(PointCloudT& cloudIn)
 {
-//    for (auto & i : cloudIn)
-//    {
-//        i.x = PCLUtilities::round(i.x);
-//    }
 
     std::cout << "PointCloud after flooring down x has: " << cloudIn.size()
               << " data points" << std::endl;
