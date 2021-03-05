@@ -8,6 +8,7 @@ srv_gen/
 src/realsense-ros
 src/ddynamic_reconfigure
 src/package_tracking/src/test_edge_tracking.cpp
+src/.gradle
 msg/*Action.msg
 msg/*ActionFeedback.msg
 msg/*ActionGoal.msg
