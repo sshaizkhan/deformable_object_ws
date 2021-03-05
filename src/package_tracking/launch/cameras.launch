@@ -1,0 +1,16 @@
+<launch>
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+        <arg name="filters"           default="pointcloud"/>
+        <arg name="camera" value="one"/>
+        <arg name="serial_no" value="935722061157" />
+
+    </include>
+
+
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+        <arg name="filters"           default="pointcloud"/>
+        <arg name="camera" value="two" />
+        <arg name="serial_no" value="925322061835" />
+
+    </include>
+</launch>

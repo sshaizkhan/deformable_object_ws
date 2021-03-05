@@ -7,11 +7,22 @@ project(package_tracking)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  std_msgs
-)
+        pcl_conversions
+        pcl_msgs
+        pcl_ros
+        roscpp
+        rospy
+        sensor_msgs
+        point_cloud_utilities
+        roslib
+        )
+
+find_package(PCL REQUIRED)
+
+
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -70,7 +81,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs
+#   pcl_msgs#   sensor_msgs
 # )
 
 ################################################
@@ -103,10 +114,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES package_tracking
-#  CATKIN_DEPENDS roscpp rospy std_msgs
-#  DEPENDS system_lib
+        INCLUDE_DIRS include
+        LIBRARIES ${PROJECT_NAME}
+        CATKIN_DEPENDS pcl_conversions pcl_msgs pcl_ros roscpp rospy sensor_msgs point_cloud_utilities
+        #  DEPENDS system_lib
 )
 
 ###########
@@ -116,13 +127,18 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
+        include
+        ${catkin_INCLUDE_DIRS}
+        ${PCL_INCLUDE_DIRS}
+        ${point_cloud_utilities_INCLUDE_DIRS}
 )
+
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/package_tracking.cpp
+#   src/${PROJECT_NAME}/my_pcl_tutorials.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -133,7 +149,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/package_tracking_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/my_pcl_tutorials_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -197,10 +213,19 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_package_tracking.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_my_pcl_tutorials.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_executable(edge_tracking src/package_edge_detection.cpp)
+target_link_libraries(edge_tracking ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+add_executable(surface_tracking src/surface_tracking.cpp)
+target_link_libraries(surface_tracking ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+add_executable (test_edge_tracking src/test_edge_tracking.cpp)
+target_link_libraries (test_edge_tracking ${catkin_LIBRARIES} ${PCL_LIBRARIES})

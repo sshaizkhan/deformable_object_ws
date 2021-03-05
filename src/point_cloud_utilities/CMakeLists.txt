@@ -8,9 +8,12 @@ project(point_cloud_utilities)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  std_msgs
+    roscpp
+    rospy
+    std_msgs
+    pcl_conversions
+    pcl_msgs
+    pcl_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -103,9 +106,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES point_cloud_utilities
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+  INCLUDE_DIRS include
+#  LIBRARIES ${PROJECT_NAME}
+  CATKIN_DEPENDS pcl_conversions pcl_msgs pcl_ros roscpp rospy sensor_msgs
 #  DEPENDS system_lib
 )
 
@@ -116,14 +119,18 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+ include
   ${catkin_INCLUDE_DIRS}
 )
 
+
+add_library(${PROJECT_NAME} STATIC
+        src/pcl_utilities.cpp
+        )
+
+# Install project namespaced headers
+
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/point_cloud_utilities.cpp
-# )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -204,3 +211,5 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
