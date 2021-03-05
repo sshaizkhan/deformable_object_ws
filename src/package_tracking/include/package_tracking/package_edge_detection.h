@@ -47,11 +47,9 @@ public:
 
     void pointCloudInfoCb(const sensor_msgs::PointCloud2& scene_cloud);
 
-    void pointCloudSaveCb(std::string& file_no_);
+//    void pointCloudSaveCb(std::string& file_no_);
 
     void cloud_processing(PointCloudT& cloudIn);
-
-
 
 //  Class Methods
     void trackEdge();
