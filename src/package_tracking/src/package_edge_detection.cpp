@@ -62,12 +62,12 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
 
     std::vector<std::vector<double>>pcl_to_vector_;
 
-    for (auto & i : cloudIn)
+    for (auto & cloud : cloudIn)
     {
         auto *store_point = new std::vector<double>(3);
-        (*store_point)[0] = i.x;
-        (*store_point)[1] = i.y;
-        (*store_point)[2] = i.z;
+        (*store_point)[0] = cloud.x;
+        (*store_point)[1] = cloud.y;
+        (*store_point)[2] = cloud.z;
 
         pcl_to_vector_.push_back(*store_point);
         delete store_point;
@@ -79,10 +79,10 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
 
     std::vector<double>all_z_vector;
 
-    for(auto & i : pcl_to_vector_)
+    for(auto & pcl_vector : pcl_to_vector_)
     {
         double z;
-        z = i[2];
+        z = pcl_vector[2];
         all_z_vector.push_back(z);
     }
 
