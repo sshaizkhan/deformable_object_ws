@@ -57,10 +57,10 @@ void PackageTracking::applyBoxFilter()
 
 void PackageTracking::cloud_processing(PointCloudT& cloudIn)
 {
-    for (auto & i : cloudIn)
-    {
-        i.x = PCLUtilities::round(i.x);
-    }
+//    for (auto & i : cloudIn)
+//    {
+//        i.x = PCLUtilities::round(i.x);
+//    }
 
     std::cout << "PointCloud after flooring down x has: " << cloudIn.size()
               << " data points" << std::endl;
@@ -98,9 +98,10 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
 
     final_cloud_created->width = pcl_to_vector_.size();
     final_cloud_created->height = 1;
+    final_cloud_created->points.clear();
     final_cloud_created->points.resize(final_cloud_created->width * final_cloud_created->height);
 
-    tolerance = 0.03;
+    tolerance = 0.01;
 
     for (std::size_t i = 0; i < final_cloud_created->points.size(); i++)
     {
@@ -115,7 +116,10 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
     }
     std::cout << "PointCloud after creating from vectors has : " << final_cloud_created->points.size()
               << " data points" << std::endl;
+
+    PCLUtilities::savePointCloudToPLY(*final_cloud_created,file_path_, "/fileSaved.ply");
 }
+
 
 int main(int argc, char** argv)
 {

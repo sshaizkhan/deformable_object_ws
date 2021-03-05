@@ -29,12 +29,11 @@ public:
     ros::Publisher package_cloud_pub_;
     std::vector<double> cam_box_limits_;
     PointCloudT::Ptr box_filtered_cloud_ptr_;
-    PointCloudT::Ptr mesh_cloud_ptr_;
     PointCloudT::Ptr final_cloud_created;
 
     double tolerance{};
 
-    PointCloudT cloudIn_xz;
+
 
 
 
