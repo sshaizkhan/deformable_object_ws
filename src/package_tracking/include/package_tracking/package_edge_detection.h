@@ -10,6 +10,7 @@
 #define SRC_PACKAGE_EDGE_DETECTION_H
 
 #include "point_cloud_utilities/pcl_utilities.h"
+#include "ros/package.h"
 
 
 typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloudT;
@@ -19,7 +20,9 @@ class PackageTracking{
 protected:
     /* data */
     std::string file_name_;
-    std::string file_path_ = "/home/shahwaz/catkin_ws/src/my_pcl_tutorials/write_data";
+    std::string file_path_ = ros::package::getPath("package_tracking") + "/data/";
+
+
 
 public:
     PackageTracking();

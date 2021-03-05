@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
         rospy
         sensor_msgs
         point_cloud_utilities
+        roslib
         )
 
 find_package(PCL REQUIRED)
