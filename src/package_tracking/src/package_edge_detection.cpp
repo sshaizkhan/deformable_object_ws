@@ -9,12 +9,12 @@ PackageTracking::PackageTracking()
 
     package_cloud_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/package_cloud", 1);
     cam_pointcloud_sub_ = nh_.subscribe("two/depth/color/points", 1, &PackageTracking::pointCloudInfoCb, this);
+    pointcloud_save_ = nh_.subscribe("/savePLY_file", 1, &PackageTracking::pointCloudSaveCb, this);
 
     cam_scene_cloud_ptr_ = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>);
     box_filtered_cloud_ptr_ = PointCloudT::Ptr (new PointCloudT);
 
     final_cloud_created = PointCloudT ::Ptr (new PointCloudT);
-
 
 }
 
@@ -28,6 +28,7 @@ void PackageTracking::pointCloudInfoCb(const sensor_msgs::PointCloud2 &scene_clo
     trackEdge();
 }
 
+
 void PackageTracking::trackEdge()
 {
 
@@ -38,6 +39,12 @@ void PackageTracking::trackEdge()
     PCLUtilities::publishMeshToRviz(*final_cloud_created, package_cloud_pub_, frame_id_);
 
     std::cout << "Publishing to RViz...." << std::endl;
+}
+
+void PackageTracking::pointCloudSaveCb(const std::string& file_no) {
+
+    PCLUtilities::savePointCloudToPLY(*final_cloud_created,file_path_, "/fileSaved_" + file_no + ".ply");
+
 }
 
 void PackageTracking::applyBoxFilter()
@@ -117,8 +124,10 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
     std::cout << "PointCloud after creating from vectors has : " << final_cloud_created->points.size()
               << " data points" << std::endl;
 
-    PCLUtilities::savePointCloudToPLY(*final_cloud_created,file_path_, "/fileSaved.ply");
+
 }
+
+
 
 
 int main(int argc, char** argv)

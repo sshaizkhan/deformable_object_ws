@@ -42,12 +42,15 @@ public:
 //  Camera members
 
     ros::Subscriber cam_pointcloud_sub_;
+    ros::Subscriber pointcloud_save_;
     std::string frame_id_;
     PointCloudT::Ptr cam_scene_cloud_ptr_;
 
 //  Callback functions
 
     void pointCloudInfoCb(const sensor_msgs::PointCloud2& scene_cloud);
+
+    void pointCloudSaveCb(const std::string& file_no);
 
     void cloud_processing(PointCloudT& cloudIn);
 
