@@ -115,6 +115,11 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
     PCLUtilities::savePointCloudToPLY(*final_cloud_created,file_path_, "/fileSaved.ply");
 }
 
+void PackageTracking::pointCloudSaveCb(const std::string file_no) {
+
+
+}
+
 
 int main(int argc, char** argv)
 {
