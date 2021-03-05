@@ -9,7 +9,7 @@ PackageTracking::PackageTracking()
 {
     package_cloud_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/package_cloud", 1);
     cam_pointcloud_sub_ = nh_.subscribe("two/depth/color/points", 1, &PackageTracking::pointCloudInfoCb, this);
-
+    save_pointcloud_sub_ = nh_.subscribe("/savePCL", 1, &PackageTracking::pointCloudSaveCb, this);
     cam_scene_cloud_ptr_ = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>);
     box_filtered_cloud_ptr_ = PointCloudT::Ptr (new PointCloudT);
 
@@ -112,14 +112,13 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
     std::cout << "PointCloud after creating from vectors has : " << final_cloud_created->points.size()
               << " data points" << std::endl;
 
-    PCLUtilities::savePointCloudToPLY(*final_cloud_created,file_path_, "/fileSaved.ply");
 }
 
-void PackageTracking::pointCloudSaveCb(const std::string file_no) {
+void PackageTracking::pointCloudSaveCb(string &file_no_) {
 
+    PCLUtilities::savePointCloudToPLY(*final_cloud_created,file_path_, "/fileSaved" + file_no_ + ".ply");
 
 }
-
 
 int main(int argc, char** argv)
 {
