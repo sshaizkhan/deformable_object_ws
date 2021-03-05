@@ -86,7 +86,7 @@ namespace PCLUtilities
     }
 
     template<typename PointT>
-    inline void publishMeshToRviz(pcl::PointCloud<PointT>cloudIn, ros::Publisher& pub, std::string& frame_id)
+    inline void publishPCLToRviz(pcl::PointCloud<PointT>cloudIn, ros::Publisher& pub, std::string& frame_id)
     {
         sensor_msgs::PointCloud2 mesh_cloud_msg;
         pcl::toROSMsg(cloudIn, mesh_cloud_msg);
@@ -100,14 +100,14 @@ namespace PCLUtilities
     void savePointCloudToPLY(pcl::PointCloud<PointT>cloudIn,const std::string& file_path, const std::string& file_name)
     {
         pcl::io::savePLYFileASCII(file_path + file_name, cloudIn);
-        std::cerr << "Saved " << cloudIn.size () << " data points to PLY File." << std::endl;
+        std::cerr << "Saved " << file_name << "at location: " << file_path <<std::endl;
     }
 
     template<typename PointT>
     void savePointCloudToPCD(pcl::PointCloud<PointT>cloudIn, const std::string& file_path, const std::string& file_name)
     {
         pcl::io::savePCDFileASCII(file_path + file_name, cloudIn);
-        std::cerr << "Saved " << cloudIn.size () << " data points to PCD File." << std::endl;
+        std::cerr << "Saved " << file_name << "at location: " << file_path <<std::endl;
 
     }
 
