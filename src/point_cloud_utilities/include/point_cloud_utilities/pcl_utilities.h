@@ -81,12 +81,12 @@ namespace PCLUtilities
         // 3766.66 + .5 =3767.16    for rounding off value
         // then type cast to int so value is 3767
         // then divided by 100 so the value converted into 37.67
-        float value = (int)(var * 1000 + .005);
+        float value = (int)(var * 1000 + .5);
         return (float)value / 1000;
     }
 
     template<typename PointT>
-    inline void publishMeshToRviz(pcl::PointCloud<PointT>cloudIn, ros::Publisher& pub, std::string& frame_id)
+    inline void publishCloudToRviz(pcl::PointCloud<PointT>cloudIn, ros::Publisher& pub, std::string& frame_id)
     {
         sensor_msgs::PointCloud2 mesh_cloud_msg;
         pcl::toROSMsg(cloudIn, mesh_cloud_msg);
