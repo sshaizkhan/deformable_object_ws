@@ -100,7 +100,7 @@ namespace PCLUtilities
     void savePointCloudToPLY(pcl::PointCloud<PointT>cloudIn,const std::string& file_path, const std::string& file_name)
     {
         pcl::io::savePLYFileASCII(file_path + file_name, cloudIn);
-        std::cerr << "Saved " << file_name << "at location: " << file_path <<std::endl;
+        std::cerr << "Saved " << file_name << " at location: " << file_path <<std::endl;
     }
 
     template<typename PointT>

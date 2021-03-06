@@ -61,9 +61,6 @@ void PackageTracking::applyBoxFilter()
 
 void PackageTracking::cloud_processing(PointCloudT& cloudIn)
 {
-    std::cout << "PointCloud after flooring down x has: " << cloudIn.size()
-              << " data points" << std::endl;
-
     std::vector<std::vector<double>>pcl_to_vector_;
 
     for (auto & cloud : cloudIn)
@@ -112,7 +109,6 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
     std::cout << "PointCloud after creating from vectors has : " << final_cloud_created->points.size()
               << " data points" << std::endl;
 }
-
 
 int main(int argc, char** argv)
 {
