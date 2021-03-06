@@ -30,12 +30,10 @@ void PackageTracking::pointCloudInfoCb(const sensor_msgs::PointCloud2 &scene_clo
 void PackageTracking::trackEdge()
 {
 
-
-//    *cam_scene_cloud_ptr_ = PCLUtilities::downSampled(*cam_scene_cloud_ptr_, 0.05);
     applyBoxFilter();
     cloud_processing(*box_filtered_cloud_ptr_);
-    PCLUtilities::publishMeshToRviz(*final_cloud_created, package_cloud_pub_, frame_id_);
-
+    PCLUtilities::publishCloudToRviz(*final_cloud_created, package_cloud_pub_, frame_id_);
+    PCLUtilities::savePointCloudToPLY(*final_cloud_created, file_path_, "/package_PLY_2.ply");
     std::cout << "Publishing to RViz...." << std::endl;
 }
 
@@ -51,15 +49,10 @@ void PackageTracking::applyBoxFilter()
     box_filter.filter(*box_filtered_cloud_ptr_);
     std::cout<<"The box-filtered point cloud has: "<<box_filtered_cloud_ptr_->points.size()<<std::endl;
 
-    PCLUtilities::savePointCloudToPLY(*box_filtered_cloud_ptr_, file_path_, "/package_PLY_2.ply");
 }
 
 void PackageTracking::cloud_processing(PointCloudT& cloudIn)
 {
-
-    std::cout << "PointCloud after flooring down x has: " << cloudIn.size()
-              << " data points" << std::endl;
-
     std::vector<std::vector<double>>pcl_to_vector_;
 
     for (auto & cloud : cloudIn)
