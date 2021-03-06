@@ -9,7 +9,7 @@ PackageTracking::PackageTracking()
 {
     package_cloud_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/package_cloud", 1);
     cam_pointcloud_sub_ = nh_.subscribe("two/depth/color/points", 1, &PackageTracking::pointCloudInfoCb, this);
-
+//    save_pointcloud_sub_ = nh_.subscribe("/savePCL", 1, &PackageTracking::pointCloudSaveCb, this);
     cam_scene_cloud_ptr_ = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>);
     box_filtered_cloud_ptr_ = PointCloudT::Ptr (new PointCloudT);
 
@@ -24,25 +24,31 @@ void PackageTracking::pointCloudInfoCb(const sensor_msgs::PointCloud2 &scene_clo
 
     std::cout << "Number of points from camera: " << cam_scene_cloud_ptr_->points.size() << std::endl;
 
+//    Calling edge tracking method
     trackEdge();
 }
 
 void PackageTracking::trackEdge()
 {
-
-
 //    *cam_scene_cloud_ptr_ = PCLUtilities::downSampled(*cam_scene_cloud_ptr_, 0.05);
+//      Box filter applied to camera feed;
     applyBoxFilter();
-    cloud_processing(*box_filtered_cloud_ptr_);
-    PCLUtilities::publishMeshToRviz(*final_cloud_created, package_cloud_pub_, frame_id_);
 
+//      Processing of Box Filtered cloud;
+    cloud_processing(*box_filtered_cloud_ptr_);
+
+//      Publishing Point Cloud to RViz
+    PCLUtilities::publishPCLToRviz(*final_cloud_created, package_cloud_pub_, frame_id_);
     std::cout << "Publishing to RViz...." << std::endl;
+
+//      Saving Point Cloud to PLY file
+    PCLUtilities::savePointCloudToPLY(*final_cloud_created, file_path_, "/package_PLY_2.ply");
+
 }
 
 void PackageTracking::applyBoxFilter()
 {
     // Using a CropBox filter to extract the region of interest from the camera scene.
-
     pcl::CropBox<pcl::PointXYZRGB> box_filter;
     std::cout<<"Input Point Cloud has: "<<cam_scene_cloud_ptr_->points.size()<<std::endl;
     box_filter.setInputCloud(cam_scene_cloud_ptr_->makeShared());
@@ -51,15 +57,10 @@ void PackageTracking::applyBoxFilter()
     box_filter.filter(*box_filtered_cloud_ptr_);
     std::cout<<"The box-filtered point cloud has: "<<box_filtered_cloud_ptr_->points.size()<<std::endl;
 
-    PCLUtilities::savePointCloudToPLY(*box_filtered_cloud_ptr_, file_path_, "/package_PLY_2.ply");
 }
 
 void PackageTracking::cloud_processing(PointCloudT& cloudIn)
 {
-
-    std::cout << "PointCloud after flooring down x has: " << cloudIn.size()
-              << " data points" << std::endl;
-
     std::vector<std::vector<double>>pcl_to_vector_;
 
     for (auto & cloud : cloudIn)
@@ -76,20 +77,16 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
     std::cout << "PointCloud after storing in vectors has : " << pcl_to_vector_.size()
               << " data points" << std::endl;
 
-
     std::vector<double>all_z_vector;
 
     for(auto & pcl_vector : pcl_to_vector_)
     {
-        double z;
-        z = pcl_vector[2];
-        all_z_vector.push_back(z);
+        all_z_vector.push_back(pcl_vector[2]);
     }
 
     sort(all_z_vector.begin(), all_z_vector.end());
     std::cout << "All Z Vector after storing in only z has : " << all_z_vector.size()
               << " data points" << std::endl;
-
 
     final_cloud_created->width = pcl_to_vector_.size();
     final_cloud_created->height = 1;
@@ -111,10 +108,7 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
     }
     std::cout << "PointCloud after creating from vectors has : " << final_cloud_created->points.size()
               << " data points" << std::endl;
-
-    PCLUtilities::savePointCloudToPLY(*final_cloud_created,file_path_, "/fileSaved.ply");
 }
-
 
 int main(int argc, char** argv)
 {
@@ -123,7 +117,6 @@ int main(int argc, char** argv)
     ros::NodeHandle pnh("~");
     pnh.param("cam_bounding_box", packObj.cam_box_limits_, std::vector<double>());
     ros::Rate loop_rate(30);
-
 
     while (ros::ok())
     {
