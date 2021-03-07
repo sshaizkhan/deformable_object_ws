@@ -12,8 +12,6 @@ EdgeTracking::EdgeTracking() {
     camera_scene_cloud_ptr_ = PointCloudT ::Ptr (new PointCloudT);
     box_filter_cloud_ptr_ = PointCloudT::Ptr (new PointCloudT);
 
-    final_point_cloud_ = PointCloudT::Ptr (new PointCloudT);
-
 }
 
 void EdgeTracking::pointCloudCb(const sensor_msgs::PointCloud2& cloud_scene) {
@@ -30,9 +28,10 @@ void EdgeTracking::pointCloudCb(const sensor_msgs::PointCloud2& cloud_scene) {
 void EdgeTracking::optimizedTrackEdge() {
 
     boxFilter();
-    point_cloud_vector = cloudProcessing(*box_filter_cloud_ptr_);
+    const vector<Coordinate> &point_cloud_vector = cloudProcessing(*box_filter_cloud_ptr_);
+    const vector<EdgePoint> &obj_edges = finalEdgeTracking(point_cloud_vector);
 
-    PCLUtilities::publishCloudToRviz(*final_point_cloud_, package_cloud_publisher_, frame_id_);
+    PCLUtilities::publishCloudToRviz(buildCloud(obj_edges), package_cloud_publisher_, frame_id_);
     std::cout << "Publishing to RViz...." << std::endl;
 
 }
@@ -50,31 +49,14 @@ void EdgeTracking::boxFilter() {
 
 }
 
-
-std::vector<std::vector<double>> EdgeTracking::cloudProcessing(PointCloudT &cloudIn) {
-
-    for (auto & cloud : cloudIn)
-    {
-        cloud.x = PCLUtilities::round(cloud.x);
-        cloud.y = 0;
-        cloud.z = cloud.z;
-
-    }
-
-    std::cout << "PointCloud after flooring down x has: " << cloudIn.size()
-              << " data points" << std::endl;
-
-    std::vector<std::vector<double>>pcl_vector_;
+std::vector<Coordinate> EdgeTracking::cloudProcessing(PointCloudT &cloudIn) {
+    
+    std::vector<Coordinate>pcl_vector_;
 
     for (auto & cloud : cloudIn)
     {
-        auto *store_point = new std::vector<double>(3);
-        (*store_point)[0] = cloud.x;
-        (*store_point)[1] = cloud.y;
-        (*store_point)[2] = cloud.z;
-
-        pcl_vector_.push_back(*store_point);
-        delete store_point;
+        pcl_vector_.emplace_back(cloud.x, cloud.y, cloud.z);
+   
     }
 
     std::cout << "PointCloud after storing in vectors has : " << pcl_vector_.size()
@@ -82,6 +64,67 @@ std::vector<std::vector<double>> EdgeTracking::cloudProcessing(PointCloudT &clou
 
     return pcl_vector_;
 }
+
+std::vector<EdgePoint> EdgeTracking::finalEdgeTracking(const std::vector<Coordinate>& coordinates) {
+
+    std::unordered_map<float, std::vector<std::pair<float,float>>> x_coordinate_map_;
+
+    for (auto coordinate : coordinates)
+    {
+        x_coordinate_map_[coordinate.getX()].push_back(std::make_pair(coordinate.getZ(),coordinate.getY()));
+    }
+
+    std::vector<EdgePoint>result;
+    for (auto& it : x_coordinate_map_)
+    {
+//        double min = *std::min_element(std::begin(it.second), std::end(it.second));
+        sort(it.second.begin(), it.second.end());
+        EdgePoint edgePoint(it.first, it.second[0].first, it.second[0].second);
+        result.push_back(edgePoint);
+    }
+
+    return result;
+}
+
+pcl::PointCloud<pcl::PointXYZRGB> EdgeTracking::buildCloud(const std::vector<EdgePoint>& edgePoints) {
+
+    PointCloudT::Ptr final_point_cloud_;
+    final_point_cloud_->width = edgePoints.size();
+    final_point_cloud_->height = 1;
+    final_point_cloud_->points.clear();
+    final_point_cloud_->points.resize(final_point_cloud_->width * final_point_cloud_->height);
+
+    for (std::size_t i = 0; i < edgePoints.size(); i++)
+    {
+        final_point_cloud_->points[i].x = edgePoints[i].getXCoordinate();
+        final_point_cloud_->points[i].z = edgePoints[i].getMinZCoordinate();
+        
+    }
+
+    std::cout << "PointCloud after creating from vectors has : " << final_point_cloud_->points.size()
+              << " data points" << std::endl;
+
+    return *final_point_cloud_;
+}
+
+int main(int argc, char** argv)
+{
+    ros::init(argc, argv, "optimized_edge_tracking");
+    EdgeTracking edgeObj;
+    ros::NodeHandle pnh("~");
+    pnh.param("cam_bounding_box", edgeObj.camera_box_limits_, std::vector<double>());
+    ros::Rate loop_rate(30);
+
+
+    while (ros::ok())
+    {
+        ros::spin();
+    }
+    return 0;
+}
+
+
+
 
 
 
