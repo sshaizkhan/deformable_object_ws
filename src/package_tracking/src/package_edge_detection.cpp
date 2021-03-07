@@ -33,7 +33,7 @@ void PackageTracking::trackEdge()
     applyBoxFilter();
     cloud_processing(*box_filtered_cloud_ptr_);
     PCLUtilities::publishCloudToRviz(*final_cloud_created, package_cloud_pub_, frame_id_);
-    PCLUtilities::savePointCloudToPLY(*final_cloud_created, file_path_, "/package_PLY_2.ply");
+    PCLUtilities::savePointCloudToPLY(*final_cloud_created, file_path_, "/pclFile.ply");
     std::cout << "Publishing to RViz...." << std::endl;
 }
 
@@ -105,7 +105,6 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
     std::cout << "PointCloud after creating from vectors has : " << final_cloud_created->points.size()
               << " data points" << std::endl;
 
-    PCLUtilities::savePointCloudToPLY(*final_cloud_created,file_path_, "/fileSaved.ply");
 }
 
 
