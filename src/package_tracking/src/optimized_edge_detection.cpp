@@ -31,7 +31,7 @@ void EdgeTracking::optimizedTrackEdge() {
     const vector<Coordinate> &point_cloud_vector = cloudProcessing(*box_filter_cloud_ptr_);
     const vector<EdgePoint> &obj_edges = finalEdgeTracking(point_cloud_vector);
 
-    PCLUtilities::publishCloudToRviz(buildCloud(obj_edges), package_cloud_publisher_, frame_id_);
+    PCLUtilities::publishPCLToRviz(buildCloud(obj_edges), package_cloud_publisher_, frame_id_);
     PCLUtilities::savePointCloudToPCD(buildCloud(obj_edges), file_path_, "hash_maped.pcd");
     std::cout << "Publishing to RViz...." << std::endl;
 
