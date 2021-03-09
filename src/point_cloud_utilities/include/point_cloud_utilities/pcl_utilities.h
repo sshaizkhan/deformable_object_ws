@@ -21,6 +21,7 @@
 #include "pcl/filters/crop_box.h"
 #include "pcl/impl/point_types.hpp"
 #include "pcl/filters/voxel_grid.h"
+#include "pcl/filters/extract_indices.h"
 #include "pcl/kdtree/kdtree.h"
 #include "pcl/features/normal_3d.h"
 #include "pcl/surface/gp3.h"
@@ -31,8 +32,9 @@
 #include "pcl/sample_consensus/method_types.h"
 #include "pcl/sample_consensus/model_types.h"
 #include "pcl/segmentation/sac_segmentation.h"
+#include "pcl/segmentation/extract_clusters.h"
 #include "pcl/visualization/pcl_visualizer.h"
-#include "pcl/io/ply_io.h"
+#include "pcl/io/pcd_io.h"
 #include "pcl_conversions/pcl_conversions.h"
 #include "pcl/registration/icp.h"
 #include "pcl/visualization/cloud_viewer.h"
@@ -294,6 +296,37 @@ namespace PCLUtilities
         box_filter_->filter(*bodyFiltered_);
 
         return *bodyFiltered_;
+
+    }
+
+    pcl::PointCloud<pcl::PointXYZ>euclideanClustering(pcl::PointCloud<pcl::PointXYZ>& cloudIn, double& tolerance, int& minClusterSize, int& maxClusterSize)
+    {
+        typename pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
+        tree->setInputCloud (cloudIn.makeShared());
+
+        std::vector<pcl::PointIndices> cluster_indices;
+        pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
+        ec.setClusterTolerance (tolerance); // 2cm
+        ec.setMinClusterSize (minClusterSize);
+        ec.setMaxClusterSize (maxClusterSize);
+        ec.setSearchMethod (tree);
+        ec.setInputCloud (cloudIn.makeShared());
+        ec.extract (cluster_indices);
+
+        int j = 0;
+        std::vector<pcl::PointCloud<pcl::PointXYZ>>extracted_cloud;
+        for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
+        {
+            pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZ>);
+            for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)
+                cloud_cluster->push_back ((cloudIn)[*pit]); //*
+            cloud_cluster->width = cloud_cluster->size ();
+            cloud_cluster->height = 1;
+            cloud_cluster->is_dense = true;
+            std::cout << "PointCloud representing the Cluster: " << cloud_cluster->size () << " data points." << std::endl;
+            extracted_cloud.push_back(*cloud_cluster);
+            j++;
+        }
 
     }
 
