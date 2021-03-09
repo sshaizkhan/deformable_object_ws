@@ -14,6 +14,7 @@
 <!--        <rosparam param="cam_bounding_box">[0.252,0.316,0.017,0.009,0.557,-0.635]</rosparam>-->
         <rosparam param="cam_bounding_box">[-0.4,0.4,-0.15,0.16,0.10,0.70]</rosparam>
         <rosparam param="file_name">"L42"</rosparam>
+        <rosparam param="max_tolerance">0.02</rosparam>
     </node>
 
 
