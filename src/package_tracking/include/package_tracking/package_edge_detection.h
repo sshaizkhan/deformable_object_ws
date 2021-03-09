@@ -19,14 +19,16 @@ class PackageTracking{
 
 protected:
     /* data */
-    std::string file_name_;
-    std::string file_path_ = ros::package::getPath("package_tracking") + "/data/";
+
+    std::string file_path_ = ros::package::getPath("package_tracking") + "/data/data_Omey/";
 
 
 
 public:
     PackageTracking();
     ros::NodeHandle nh_;
+
+    std::string file_name;
 
 //  Point cloud tracking members
     ros::Publisher package_cloud_pub_;
