@@ -33,6 +33,7 @@ public:
                                                                                min_z_coordinate(minZCoordinate),
                                                                                corresponding_y(correspondingY) {}
 
+
 };
 
 class Coordinate{
@@ -90,7 +91,7 @@ public:
 
     static std::vector<EdgePoint> finalEdgeTracking(const std::vector<Coordinate>& pclVector_);
 
-    static pcl::PointCloud<pcl::PointXYZRGB>buildCloud(const std::vector<EdgePoint>& edgePoints);
+    static pcl::PointCloud<pcl::PointXYZ>buildCloud(const std::vector<EdgePoint>& edgePoints);
 
 };
 
