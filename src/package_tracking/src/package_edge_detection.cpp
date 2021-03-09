@@ -34,6 +34,7 @@ void PackageTracking::trackEdge()
     PointCloudT::Ptr euclidean_point_cloud_  (new PointCloudT);
     *euclidean_point_cloud_ =PCLUtilities::euclideanClustering(*box_filtered_cloud_ptr_, ec_tolerance, minClusterSize, maxClusterSize);
     cloud_processing(*euclidean_point_cloud_);
+    PCLUtilities::publishPCLToRviz(*final_cloud_created, package_cloud_pub_, frame_id_);
     PCLUtilities::savePointCloudToPLY(*final_cloud_created, file_path_, file_name + ".ply");
     std::cout << "Publishing to RViz...." << std::endl;
 
