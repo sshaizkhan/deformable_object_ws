@@ -299,13 +299,14 @@ namespace PCLUtilities
 
     }
 
-    pcl::PointCloud<pcl::PointXYZ>euclideanClustering(pcl::PointCloud<pcl::PointXYZ>& cloudIn, double& tolerance, int& minClusterSize, int& maxClusterSize)
+    template<typename PointT>
+    pcl::PointCloud<PointT>euclideanClustering(const pcl::PointCloud<PointT>& cloudIn, double& tolerance, int& minClusterSize, int& maxClusterSize)
     {
-        typename pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
+        typename pcl::search::KdTree<PointT>::Ptr tree (new pcl::search::KdTree<PointT>);
         tree->setInputCloud (cloudIn.makeShared());
 
         std::vector<pcl::PointIndices> cluster_indices;
-        pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
+        pcl::EuclideanClusterExtraction<PointT> ec;
         ec.setClusterTolerance (tolerance); // 2cm
         ec.setMinClusterSize (minClusterSize);
         ec.setMaxClusterSize (maxClusterSize);
@@ -314,20 +315,29 @@ namespace PCLUtilities
         ec.extract (cluster_indices);
 
         int j = 0;
-        std::vector<pcl::PointCloud<pcl::PointXYZ>>extracted_cloud;
+        std::vector<pcl::PointCloud<PointT>>extracted_cloud;
         for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
         {
-            pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZ>);
+            typename pcl::PointCloud<PointT>::Ptr cloud_cluster (new pcl::PointCloud<PointT>);
             for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)
                 cloud_cluster->push_back ((cloudIn)[*pit]); //*
             cloud_cluster->width = cloud_cluster->size ();
             cloud_cluster->height = 1;
             cloud_cluster->is_dense = true;
-            std::cout << "PointCloud representing the Cluster: " << cloud_cluster->size () << " data points." << std::endl;
+//            std::cout << "PointCloud representing the Cluster: " << cloud_cluster->size () << " data points." << std::endl;
             extracted_cloud.push_back(*cloud_cluster);
             j++;
         }
-
+        if(!extracted_cloud.empty())
+        {
+            std::cout << "Extracted " << extracted_cloud.size() << "clusters" << std::endl;
+            return extracted_cloud[0];
+        }
+        else
+        {
+            std::cout<<"No clusters formed.Returning original point cloud. \n";
+            return cloudIn;
+        }
     }
 
     template<typename PointT, typename Value>
