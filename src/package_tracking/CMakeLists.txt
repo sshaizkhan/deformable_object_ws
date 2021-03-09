@@ -226,6 +226,3 @@ target_link_libraries(edge_tracking ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
 add_executable(surface_tracking src/surface_tracking.cpp)
 target_link_libraries(surface_tracking ${catkin_LIBRARIES} ${PCL_LIBRARIES})
-
-add_executable(optimized_edge_tracking src/optimized_edge_detection.cpp)
-target_link_libraries(optimized_edge_tracking ${catkin_LIBRARIES} ${PCL_LIBRARIES})
