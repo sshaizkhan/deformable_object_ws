@@ -14,6 +14,9 @@
         <rosparam param="cam_bounding_box">[-0.5,0.5,-0.25,0.06,0.6,0.75]</rosparam>
         <rosparam param="file_name">"L42"</rosparam>
         <rosparam param="max_tolerance">0.02</rosparam>
+        <rosparam param="ec_tolerance">0.005</rosparam>
+        <rosparam param="minClusterSize">1000</rosparam>
+        <rosparam param="maxClusterSize">6500</rosparam>
     </node>
 
 
