@@ -33,7 +33,7 @@ void PackageTracking::trackEdge()
     applyBoxFilter();
     cloud_processing(*box_filtered_cloud_ptr_);
     PCLUtilities::publishCloudToRviz(*final_cloud_created, package_cloud_pub_, frame_id_);
-    PCLUtilities::savePointCloudToPLY(*final_cloud_created, file_path_, "/pclFile.ply");
+    PCLUtilities::savePointCloudToPLY(*final_cloud_created, file_path_, file_name + ".ply");
     std::cout << "Publishing to RViz...." << std::endl;
 }
 
@@ -74,9 +74,9 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
 
     for(auto & pcl_vector : pcl_to_vector_)
     {
-        double z;
-        z = pcl_vector[2];
-        all_z_vector.push_back(z);
+//        double z;
+//        z = pcl_vector[2];
+        all_z_vector.push_back(pcl_vector[2]);
     }
 
     sort(all_z_vector.begin(), all_z_vector.end());
@@ -88,8 +88,6 @@ void PackageTracking::cloud_processing(PointCloudT& cloudIn)
     final_cloud_created->height = 1;
     final_cloud_created->points.clear();
     final_cloud_created->points.resize(final_cloud_created->width * final_cloud_created->height);
-
-    tolerance = 0.01;
 
     for (std::size_t i = 0; i < final_cloud_created->points.size(); i++)
     {
@@ -114,7 +112,9 @@ int main(int argc, char** argv)
     PackageTracking packObj;
     ros::NodeHandle pnh("~");
     pnh.param("cam_bounding_box", packObj.cam_box_limits_, std::vector<double>());
-    ros::Rate loop_rate(30);
+    pnh.param("file_name", packObj.file_name, std::string());
+    pnh.param("max_tolerance", packObj.tolerance, double());
+    ros::Rate loop_rate(5);
 
 
     while (ros::ok())
