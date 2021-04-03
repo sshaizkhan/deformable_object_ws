@@ -115,7 +115,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES hinge_detection
-  CATKIN_DEPENDS pcl roscpp roslib std_msgs geometry_msgs
+  CATKIN_DEPENDS pcl roscpp roslib std_msgs geometry_msgs message_runtime
 #  DEPENDS system_lib
 )
 
