@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_conversions
   pcl_msgs
   pcl_ros
+  package_tracking
 )
 
 ## System dependencies are found with CMake's conventions
@@ -128,6 +129,7 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${package_tracking_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
