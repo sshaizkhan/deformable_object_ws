@@ -21,6 +21,7 @@
 #include "pcl/filters/crop_box.h"
 #include "pcl/impl/point_types.hpp"
 #include "pcl/filters/voxel_grid.h"
+#include "pcl/filters/extract_indices.h"
 #include "pcl/kdtree/kdtree.h"
 #include "pcl/features/normal_3d.h"
 #include "pcl/surface/gp3.h"
@@ -31,8 +32,9 @@
 #include "pcl/sample_consensus/method_types.h"
 #include "pcl/sample_consensus/model_types.h"
 #include "pcl/segmentation/sac_segmentation.h"
+#include "pcl/segmentation/extract_clusters.h"
 #include "pcl/visualization/pcl_visualizer.h"
-#include "pcl/io/ply_io.h"
+#include "pcl/io/pcd_io.h"
 #include "pcl_conversions/pcl_conversions.h"
 #include "pcl/registration/icp.h"
 #include "pcl/visualization/cloud_viewer.h"
@@ -73,16 +75,19 @@
 //          NAME SPACE
 /****************************************/
 
+
+//// This is a PCLUtilities namespace method. It has all the
 namespace PCLUtilities
 {
-    float round(float var)
+
+    double round(double var, double threshold)
     {
-        // 37.66666 * 100 =3766.66
+        // 37.66666 /0.005 =3766.66
         // 3766.66 + .5 =3767.16    for rounding off value
         // then type cast to int so value is 3767
         // then divided by 100 so the value converted into 37.67
-        float value = (int)(var * 1000 + .5);
-        return (float)value / 1000;
+        double value = (floor(var /threshold) + 1) * threshold;
+        return value;
     }
 
     template<typename PointT>
@@ -102,14 +107,14 @@ namespace PCLUtilities
     void savePointCloudToPLY(pcl::PointCloud<PointT>cloudIn,const std::string& file_path, const std::string& file_name)
     {
         pcl::io::savePLYFileASCII(file_path + file_name, cloudIn);
-        std::cerr << "Saved " << file_name << " at location: " << file_path <<std::endl;
+        std::cerr << "Saved " << file_name << " at location: " << file_path + file_name <<std::endl;
     }
 
     template<typename PointT>
     void savePointCloudToPCD(pcl::PointCloud<PointT>cloudIn, const std::string& file_path, const std::string& file_name)
     {
         pcl::io::savePCDFileASCII(file_path + file_name, cloudIn);
-        std::cerr << "Saved " << file_name << "at location: " << file_path <<std::endl;
+        std::cerr << "Saved " << file_name << "at location: " << file_path + file_name<<std::endl;
 
     }
 
@@ -297,6 +302,176 @@ namespace PCLUtilities
 
     }
 
+//    template<typename PointT>
+//    typename pcl::PointCloud<PointT> euclideanClustering(typename pcl::PointCloud<PointT>::Ptr cloudIn, double& ec_tolerance, int& minClusterSize, int& maxClusterSize)
+//    {
+//        typename pcl::search::KdTree<PointT>::Ptr tree (new pcl::search::KdTree<PointT>);
+//        tree->setInputCloud (cloudIn);
+//
+//        pcl::SACSegmentation<PointT> seg;
+//        pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
+//        pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
+//        typename pcl::PointCloud<PointT>::Ptr cloud_plane (new pcl::PointCloud<PointT> ());
+//        typename pcl::PointCloud<PointT>::Ptr cloud_f (new pcl::PointCloud<PointT>);
+//        seg.setOptimizeCoefficients (true);
+//        seg.setModelType (pcl::SACMODEL_PLANE);
+//        seg.setMethodType (pcl::SAC_RANSAC);
+//        seg.setMaxIterations (100000);
+//        seg.setDistanceThreshold (0.005);
+//        int i=0, nr_points = (int) cloudIn->size ();
+//        while (cloudIn->size () > 0.3 * nr_points)
+//        {
+//            // Segment the largest planar component from the remaining cloud
+//            seg.setInputCloud (cloudIn);
+//            seg.segment (*inliers, *coefficients);
+//            if (inliers->indices.size () == 0)
+//            {
+//                std::cout << "Could not estimate a planar model for the given dataset." << std::endl;
+//                break;
+//            }
+//            // Extract the planar inliers from the input cloud
+//            pcl::ExtractIndices<PointT> extract;
+//            extract.setInputCloud (cloudIn);
+//            extract.setIndices (inliers);
+//            extract.setNegative (false);
+//
+//            // Get the points associated with the planar surface
+//            extract.filter (*cloud_plane);
+//            std::cout << "PointCloud representing the planar component: " << cloud_plane->size () << " data points." << std::endl;
+//
+//            // Remove the planar inliers, extract the rest
+//            extract.setNegative (true);
+//            extract.filter (*cloud_f);
+//            *cloudIn = *cloud_f;
+//        }
+//
+//
+//        std::vector<pcl::PointIndices> cluster_indices;
+//        pcl::EuclideanClusterExtraction<PointT> ec;
+//        ec.setClusterTolerance (ec_tolerance); // 2cm
+//        ec.setMinClusterSize (minClusterSize);
+//        ec.setMaxClusterSize (maxClusterSize);
+//        ec.setSearchMethod (tree);
+//        ec.setInputCloud (cloudIn);
+//        ROS_INFO("Before Extract Cluster");
+//        ec.extract (cluster_indices);
+//
+//        typename std::vector<pcl::PointCloud<PointT>>::Ptr extracted_cloud;
+//        std::cout<<"The size of the cluster indices = "<<cluster_indices.size()<<std::endl;
+//        for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
+//        {
+//            typename pcl::PointCloud<PointT>::Ptr cloud_cluster (new pcl::PointCloud<PointT>);
+//            for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)
+//                cloud_cluster->push_back ((*cloudIn)[*pit]); //*
+//            cloud_cluster->width = cloud_cluster->size ();
+//            cloud_cluster->height = 1;
+//            cloud_cluster->is_dense = true;
+//            std::cout << "PointCloud representing the Cluster: " << cloud_cluster->size () << " data points." << std::endl;
+//            extracted_cloud->push_back(*cloud_cluster);
+//
+////            std::cout << "1" << std::endl;
+//        }
+//
+////        std::cout << "2" << std::endl;
+//        if(!extracted_cloud->empty())
+//        {
+//            std::cout << "Extracted " << extracted_cloud->size() << "clusters" << std::endl;
+//            return *extracted_cloud[0];
+//        }
+//        else
+//        {
+//            std::cout<<"No clusters formed. Returning original point cloud. \n";
+//            return *cloudIn;
+//        }
+//    }
+///////////////////////////////////////////////
+pcl::PointCloud<pcl::PointXYZ> euclideanClustering(pcl::PointCloud<pcl::PointXYZ>::Ptr& cloudIn, double& ec_tolerance, int& minClusterSize, int& maxClusterSize)
+    {
+        typename pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
+        tree->setInputCloud (cloudIn);
+
+        pcl::SACSegmentation<pcl::PointXYZ> seg;
+        pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
+        pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
+        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZ> ());
+        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZ>);
+        seg.setOptimizeCoefficients (true);
+        seg.setModelType (pcl::SACMODEL_PLANE);
+        seg.setMethodType (pcl::SAC_RANSAC);
+        seg.setMaxIterations (100000);
+        seg.setDistanceThreshold (0.005);
+        int i=0, nr_points = (int) cloudIn->size ();
+        while (cloudIn->size () > 0.3 * nr_points)
+        {
+            // Segment the largest planar component from the remaining cloud
+            seg.setInputCloud (cloudIn);
+            seg.segment (*inliers, *coefficients);
+            if (inliers->indices.size () == 0)
+            {
+                std::cout << "Could not estimate a planar model for the given dataset." << std::endl;
+                break;
+            }
+            // Extract the planar inliers from the input cloud
+            pcl::ExtractIndices<pcl::PointXYZ> extract;
+            extract.setInputCloud (cloudIn);
+            extract.setIndices (inliers);
+            extract.setNegative (false);
+
+            // Get the points associated with the planar surface
+            extract.filter (*cloud_plane);
+            std::cout << "PointCloud representing the planar component: " << cloud_plane->size () << " data points." << std::endl;
+
+            // Remove the planar inliers, extract the rest
+            extract.setNegative (true);
+            extract.filter (*cloud_f);
+            *cloudIn = *cloud_f;
+        }
+
+
+        std::vector<pcl::PointIndices> cluster_indices;
+        pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
+        ec.setClusterTolerance (ec_tolerance); // 2cm
+        ec.setMinClusterSize (minClusterSize);
+        ec.setMaxClusterSize (maxClusterSize);
+        ec.setSearchMethod (tree);
+        ec.setInputCloud (cloudIn);
+        ROS_INFO("Before Extract Cluster");
+        ec.extract (cluster_indices);
+
+        std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> extracted_cloud;
+        std::cout<<"The size of the cluster indices = "<<cluster_indices.size()<<std::endl;
+        for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
+        {
+            pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZ>);
+            for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)
+                cloud_cluster->push_back ((*cloudIn)[*pit]); //*
+            cloud_cluster->width = cloud_cluster->size ();
+            cloud_cluster->height = 1;
+            cloud_cluster->is_dense = true;
+            std::cout << "PointCloud representing the Cluster: " << cloud_cluster->size () << " data points." << std::endl;
+            extracted_cloud.push_back(cloud_cluster);
+
+//            std::cout << "1" << std::endl;
+        }
+
+//        std::cout << "2" << std::endl;
+        if(!extracted_cloud.empty())
+        {
+            std::cout << "Extracted " << extracted_cloud.size() << "clusters" << std::endl;
+            return *extracted_cloud[0];
+        }
+        else
+        {
+            std::cout<<"No clusters formed. Returning original point cloud. \n";
+            return *cloudIn;
+        }
+    }
+
+
+
+
+
+/////////////////////////////////////////////////
     template<typename PointT, typename Value>
     pcl::PointCloud<PointT>octreeSearchPartition(pcl::PointCloud<PointT>& pointCloud, const std::string& searchType,
                                                  const double searchX, const double searchY, const double searchZ ,Value num)

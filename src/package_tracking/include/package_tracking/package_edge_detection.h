@@ -13,16 +13,13 @@
 #include "ros/package.h"
 
 
-typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloudT;
+typedef pcl::PointCloud<pcl::PointXYZ> PointCloudT;
 
 class PackageTracking{
 
 protected:
     /* data */
-
     std::string file_path_ = ros::package::getPath("package_tracking") + "/data/data_Omey/";
-
-
 
 public:
     PackageTracking();
@@ -34,14 +31,15 @@ public:
     ros::Publisher package_cloud_pub_;
     std::vector<double> cam_box_limits_;
     PointCloudT::Ptr box_filtered_cloud_ptr_;
-    PointCloudT::Ptr final_cloud_created;
 
     double tolerance{};
+    double ec_tolerance{};
+    int minClusterSize{};
+    int maxClusterSize{};
 
 //  Camera members
 
     ros::Subscriber cam_pointcloud_sub_;
-    ros::Subscriber save_pointcloud_sub_;
     std::string frame_id_;
     PointCloudT::Ptr cam_scene_cloud_ptr_;
 
@@ -51,7 +49,7 @@ public:
 
 //    void pointCloudSaveCb(std::string& file_no_);
 
-    void cloud_processing(PointCloudT& cloudIn);
+    PointCloudT cloud_processing(PointCloudT& cloudIn) const;
 
 //  Class Methods
     void trackEdge();
