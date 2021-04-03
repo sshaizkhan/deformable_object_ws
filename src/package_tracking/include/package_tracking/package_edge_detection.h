@@ -31,7 +31,6 @@ public:
     ros::Publisher package_cloud_pub_;
     std::vector<double> cam_box_limits_;
     PointCloudT::Ptr box_filtered_cloud_ptr_;
-    PointCloudT::Ptr final_cloud_created;
 
     double tolerance{};
     double ec_tolerance{};
@@ -50,7 +49,7 @@ public:
 
 //    void pointCloudSaveCb(std::string& file_no_);
 
-    void cloud_processing(PointCloudT& cloudIn);
+    PointCloudT cloud_processing(PointCloudT& cloudIn) const;
 
 //  Class Methods
     void trackEdge();

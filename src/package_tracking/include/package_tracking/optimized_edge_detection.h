@@ -7,7 +7,8 @@
 
 #include "point_cloud_utilities/pcl_utilities.h"
 #include "ros/package.h"
-typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloudT;
+
+typedef pcl::PointCloud<pcl::PointXYZ> PointCloudT;
 
 
 class EdgePoint {
@@ -32,11 +33,9 @@ public:
     EdgePoint(float xCoordinate, float minZCoordinate, float correspondingY) : x_coordinate(xCoordinate),
                                                                                min_z_coordinate(minZCoordinate),
                                                                                corresponding_y(correspondingY) {}
-
-
 };
 
-class Coordinate{
+class Coordinate {
 private:
     float x;
     float y;
@@ -58,14 +57,17 @@ public:
     Coordinate(float x, float y, float z) : x(x), y(y), z(z) {}
 };
 
-class EdgeTracking{
+class EdgeTracking {
 
 protected:
     /* data */
-    std::string file_path_ = ros::package::getPath("package_tracking") + "/data/";
+    std::string file_path_ = ros::package::getPath("package_tracking") + "/data/optimized_data/";
+
+public:
 
 public:
     EdgeTracking();
+
     ros::NodeHandle node_;
 
 //  Point cloud tracking members
@@ -74,7 +76,7 @@ public:
     PointCloudT::Ptr box_filter_cloud_ptr_;
 
 //    Data members
-    double tolerance{};
+    float z_tolerance{};
 
 //  Camera members
     ros::Subscriber camera_point_cloud_sub_;
@@ -82,16 +84,18 @@ public:
     PointCloudT::Ptr camera_scene_cloud_ptr_;
 
 //  Callback functions
-    void pointCloudCb(const sensor_msgs::PointCloud2& cloud_scene);
+    void pointCloudCb(const sensor_msgs::PointCloud2 &cloud_scene);
 
 //  Class Methods
     void optimizedTrackEdge();
+
     void boxFilter();
-    static std::vector<Coordinate> cloudProcessing(PointCloudT& cloudIn);
 
-    static std::vector<EdgePoint> finalEdgeTracking(const std::vector<Coordinate>& pclVector_);
+    static std::vector<Coordinate> cloudProcessing(PointCloudT &cloudIn);
 
-    static pcl::PointCloud<pcl::PointXYZ>buildCloud(const std::vector<EdgePoint>& edgePoints);
+    static std::vector<EdgePoint> finalEdgeTracking(const std::vector<Coordinate> &pclVector_, float &z_tol);
+
+    static pcl::PointCloud<pcl::PointXYZ> buildCloud(const std::vector<EdgePoint> &edgePoints);
 
 };
 
