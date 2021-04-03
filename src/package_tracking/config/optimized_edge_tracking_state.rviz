@@ -64,7 +64,7 @@ Visualization Manager:
       Class: rviz/PointCloud2
       Color: 255; 255; 255
       Color Transformer: Intensity
-      Decay Time: 0
+      Decay Time: 0.10000000149011612
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
@@ -76,7 +76,7 @@ Visualization Manager:
       Queue Size: 10
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.0005000000237487257
+      Size (m): 0.00039999998989515007
       Style: Flat Squares
       Topic: /edge_cloud
       Unreliable: false
@@ -111,25 +111,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.6758897304534912
+      Distance: 1.144620656967163
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.4947725832462311
-        Y: -0.058022353798151016
-        Z: 0.07656096667051315
+        X: 0.4739093482494354
+        Y: 0.2360173761844635
+        Z: -0.11288676410913467
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3347967267036438
+      Pitch: 0.309797078371048
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.9604310989379883
+      Yaw: 3.230435848236084
     Saved: ~
 Window Geometry:
   Displays:
