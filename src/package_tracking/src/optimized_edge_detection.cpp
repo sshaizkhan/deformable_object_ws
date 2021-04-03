@@ -28,7 +28,7 @@ void EdgeTracking::optimizedTrackEdge() {
     *final_cloud_ = buildCloud(obj_edges);
 //    *euclidean_point_cloud_ = PCLUtilities::euclideanClustering(final_cloud_, ec_tolerance, minClusterSize, maxClusterSize);
     PCLUtilities::publishPCLToRviz(*final_cloud_, package_cloud_publisher_, frame_id_);
-//    PCLUtilities::savePointCloudToPCD(buildCloud(obj_edges), file_path_, "hash_maped.pcd");
+    PCLUtilities::savePointCloudToPLY(buildCloud(obj_edges), file_path_, "P1.ply");
     std::cout << "Publishing to RViz...." << std::endl;
 }
 
@@ -71,21 +71,6 @@ std::vector<EdgePoint> EdgeTracking::finalEdgeTracking(const std::vector<Coordin
         EdgePoint edgePoint(it.first, it.second[0].first, it.second[0].second);
         result.push_back(edgePoint);
     }
-//
-//    std::vector<EdgePoint> result;
-//    for (auto &it : x_coordinate_map_) {
-//
-//        sort(it.second.begin(), it.second.end());
-//        float tolerance = it.second[0].first + z_tolerance;
-//        for (auto it_z: it.second) {
-//            if (it_z.first <= tolerance) {
-////                std::cout << "z_min: " << it_z.first << std::endl;
-//                EdgePoint edgePoint(it.first, it_z.first, it_z.second);
-//                result.push_back(edgePoint);
-//            } else
-//                continue;
-//        }
-//    }
     return result;
 }
 
