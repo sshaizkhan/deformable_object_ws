@@ -7,6 +7,7 @@
 EdgeTracking::EdgeTracking() {
 
     package_cloud_publisher_ = node_.advertise<sensor_msgs::PointCloud2>("/edge_cloud", 1);
+    package_marker_publisher_ = node_.advertise<visualization_msgs::Marker>("visualization_marker", 1);
     camera_point_cloud_sub_ = node_.subscribe("two/depth/color/points", 1, &EdgeTracking::pointCloudCb, this);
     camera_scene_cloud_ptr_ = PointCloudT::Ptr(new PointCloudT);
     box_filter_cloud_ptr_ = PointCloudT::Ptr(new PointCloudT);
@@ -28,6 +29,7 @@ void EdgeTracking::optimizedTrackEdge() {
     *final_cloud_ = buildCloud(obj_edges);
 //    *euclidean_point_cloud_ = PCLUtilities::euclideanClustering(final_cloud_, ec_tolerance, minClusterSize, maxClusterSize);
     PCLUtilities::publishPCLToRviz(*final_cloud_, package_cloud_publisher_, frame_id_);
+    PCLUtilities::rvizMarkerPublish(*final_cloud_, package_marker_publisher_, frame_id_, "line");
     PCLUtilities::savePointCloudToPLY(buildCloud(obj_edges), file_path_, "P1.ply");
     std::cout << "Publishing to RViz...." << std::endl;
 }

@@ -72,6 +72,7 @@ public:
 
 //  Point cloud tracking members
     ros::Publisher package_cloud_publisher_;
+    ros::Publisher package_marker_publisher_;
     std::vector<double> camera_box_limits_;
     PointCloudT::Ptr box_filter_cloud_ptr_;
 
