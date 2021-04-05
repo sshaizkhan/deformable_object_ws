@@ -9,6 +9,7 @@
 /****************************************/
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
+#include "ros/package.h"
 
 /****************************************/
 //          PCL HEADERS
@@ -109,10 +110,8 @@ namespace PCLUtilities
     }
 
     template<typename PointT>
-    inline void rvizMarkerPublish(pcl::PointCloud<PointT>& cloudIn, ros::Publisher& marker_pub, std::string& frame_id, const std::string& marker_type)
+    inline void rvizMarkerPublish(pcl::PointCloud<PointT>& cloudIn, ros::Publisher& marker_pub, std::string& frame_id)
     {
-        sensor_msgs::PointCloud2 package_cloud_msg;
-        pcl::toROSMsg(cloudIn, package_cloud_msg);
         visualization_msgs::Marker points, line_strip;
         points.header.frame_id = line_strip.header.frame_id = frame_id;
         points.header.stamp = line_strip.header.stamp = ros::Time::now();
@@ -129,11 +128,11 @@ namespace PCLUtilities
         line_strip.type = visualization_msgs::Marker::LINE_STRIP;
 
         // POINTS markers use x and y scale for width/height respectively
-        points.scale.x = 0.2;
-        points.scale.y = 0.2;
+        points.scale.x = 0.0008;
+        points.scale.y = 0.0008;
 
         // LINE_STRIP/LINE_LIST markers use only the x component of scale, for the line width
-        line_strip.scale.x = 0.1;
+        line_strip.scale.x = 0.0004;
 
         // Points are green
         points.color.g = 1.0f;
@@ -141,6 +140,7 @@ namespace PCLUtilities
 
         // Line strip is blue
         line_strip.color.b = 1.0;
+        line_strip.color.a = 1.0;
 
         for (std::size_t i = 0; i < cloudIn.size(); i++)
         {
@@ -153,10 +153,9 @@ namespace PCLUtilities
             line_strip.points.push_back(p);
 
         }
-        if (marker_type == "points")
-            marker_pub.template publish(points);
-        else
-            marker_pub.template publish(line_strip);
+
+        marker_pub.template publish(points);
+        marker_pub.template publish(line_strip);
 
     }
 
