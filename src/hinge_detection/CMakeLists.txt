@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_conversions
   pcl_msgs
   pcl_ros
+  sensor_msgs
   package_tracking
 )
 
@@ -116,7 +117,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES hinge_detection
-  CATKIN_DEPENDS pcl roscpp roslib std_msgs geometry_msgs message_runtime
+  CATKIN_DEPENDS pcl_conversions pcl_msgs pcl_ros roscpp roslib rospy sensor_msgs message_runtime package_tracking
 #  DEPENDS system_lib
 )
 
@@ -127,14 +128,18 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-  ${package_tracking_INCLUDE_DIRS}
+      include
+      ${catkin_INCLUDE_DIRS}
+      ${PCL_INCLUDE_DIRS}
+      ${package_tracking_INCLUDE_DIRS}
 )
 
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/hinge_detection.cpp
+# add_library(${package_tracking}
+#   src/${package_tracking}/optimized_edge_tracking.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -215,3 +220,6 @@ catkin_install_python(PROGRAMS scripts/point_cloud.py
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_executable(bend_category src/bend_categorization.cpp)
+target_link_libraries(bend_category ${catkin_LIBRARIES} ${PCL_LIBRARIES})
