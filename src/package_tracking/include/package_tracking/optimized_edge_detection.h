@@ -6,7 +6,6 @@
 #define PACKAGE_TRACKING_OPTIMIZED_EDGE_DETECTION_H
 
 #include "point_cloud_utilities/pcl_utilities.h"
-#include "ros/package.h"
 
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloudT;
 
