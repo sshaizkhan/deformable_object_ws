@@ -7,6 +7,8 @@ Panels:
         - /Global Options1
         - /Status1
         - /PointCloud21
+        - /Marker1
+        - /Marker1/Namespaces1
       Splitter Ratio: 0.5
     Tree Height: 728
   - Class: rviz/Selection
@@ -83,6 +85,15 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /visualization_marker
+      Name: Marker
+      Namespaces:
+        line_strip: false
+        points: true
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -111,25 +122,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.144620656967163
+      Distance: 1.040725827217102
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.4739093482494354
-        Y: 0.2360173761844635
-        Z: -0.11288676410913467
+        X: 0.4557824730873108
+        Y: 0.14415103197097778
+        Z: -0.15874388813972473
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.309797078371048
+      Pitch: 0.2097974419593811
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.230435848236084
+      Yaw: 3.285447359085083
     Saved: ~
 Window Geometry:
   Displays:
