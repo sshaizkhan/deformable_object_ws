@@ -28,11 +28,11 @@ void BendDetection::calculateEdgeLength() {
         set_straight_length_ = straightEdge(final_cloud_coordinates);
         nh_.setParam("package_length", set_straight_length_);
 
-        std::cout << "===================================================================" << std::endl;
-        std::cout << "|                                                                 | " << std::endl;
-        std::cout << "                          Edge length in m: " << set_straight_length_ << std::endl;
-        std::cout << "|                                                                 |" << std::endl;
-        std::cout << "===================================================================" << std::endl;
+        std::cout << " ===================================================================" << std::endl;
+        std::cout << " |                                                                 | " << std::endl;
+        std::cout << " |                   Edge length in m: " << set_straight_length_<<"|" << std::endl;
+        std::cout << " |                                                                 |" << std::endl;
+        std::cout << " ===================================================================" << std::endl;
     }
 
     else if (bend_check == "bend")
@@ -43,7 +43,7 @@ void BendDetection::calculateEdgeLength() {
 
 }
 
-std::vector<CloudCoordinates> BendDetection::edgePointProcessing(PointCloudT& cloudIn) const {
+std::vector<CloudCoordinates> BendDetection::edgePointProcessing(PointCloudT& cloudIn) {
     std::vector<CloudCoordinates> cloud_coordinates;
     for (auto &cloud: cloudIn)
     {
@@ -55,7 +55,7 @@ std::vector<CloudCoordinates> BendDetection::edgePointProcessing(PointCloudT& cl
 
 }
 
-float BendDetection::straightEdge(vector<CloudCoordinates> &cloudCoordinates) const {
+float BendDetection::straightEdge(vector<CloudCoordinates> &cloudCoordinates) {
     std::vector<float> x_coordinate;
     for (auto &cloudCoordinate : cloudCoordinates)
     {
@@ -143,38 +143,56 @@ float BendDetection::bendEdge(vector<CloudCoordinates> &cloudCoordinates) const 
     L2 = sqrt(L2);
     std::cout << "L2: " << L2 << std::endl;
 
-    if (abs((L1 + L2) - get_straight_length_) < 0.01) {
-        if (abs(P2[1] - Q2[1]) > 0.002)
+    std::cout << "L1 - L2: " << abs(L1 - L2) << std::endl;
+    std::cout << "(L1 + L2) - get_straight_length: " << abs(L1 + L2 - get_straight_length_) << std::endl;
+    std::cout << "P1[1] - Q2[1]: " << abs(P1[1] - Q2[1]) <<std::endl;
+    std::cout << "Q1[1] - Q2[1]: " << abs(Q1[1] - Q2[1]) << std::endl;
+
+    if (abs(L1 - L2) <= 0.05) {
+        if (abs(P1[1] - Q2[1]) <= 0.01)
         {
-            std::cout << "===================================================================" << std::endl;
-            std::cout << "|                                                                 | " << std::endl;
-            std::cout << "                          NO BEND: "                                  << std::endl;
-            std::cout << "|                                                                 |" << std::endl;
-            std::cout << "===================================================================" << std::endl;
+            std::cout << " =================================================================== " << std::endl;
+            std::cout << " |                                                                 | " << std::endl;
+            std::cout << " |                          NO BEND:                               | " << std::endl;
+            std::cout << " |                                                                 | " << std::endl;
+            std::cout << " =================================================================== " << std::endl;
         }
         else
         {
-            std::cout << "===================================================================" << std::endl;
-            std::cout << "|                                                                 | " << std::endl;
-            std::cout << "                          MID BEND: "                                 << std::endl;
-            std::cout << "|                                                                 |" << std::endl;
-            std::cout << "===================================================================" << std::endl;
+            std::cout << " =================================================================== " << std::endl;
+            std::cout << " |                                                                 | " << std::endl;
+            std::cout << " |                          MID BEND:                              | " << std::endl;
+            std::cout << " |                                                                 | " << std::endl;
+            std::cout << " =================================================================== " << std::endl;
         }
     }
-    else
+//    else if (abs((L1 + L2) - get_straight_length_) <= 0.01)
+//    {
+//        std::cout << " ==================================================================== " << std::endl;
+//        std::cout << " |                                                                  | " << std::endl;
+//        std::cout << " |            UNIDENTIFIED BEND. PLEASE CHECK PACKAGE               | "   << std::endl;
+//        std::cout << " |                                                                  | " << std::endl;
+//        std::cout << " ==================================================================== " << std::endl;
+//    }
+
+    else if (abs(L1 - L2) >= 0.05)
     {
-        std::cout << "===================================================================" << std::endl;
-        std::cout << "|                                                                 | " << std::endl;
-        std::cout << "                          CORNER BEND: "                              << std::endl;
-        std::cout << "|                                                                 |" << std::endl;
-        std::cout << "===================================================================" << std::endl;
+        std::cout << " ==================================================================== " << std::endl;
+        std::cout << " |                                                                  | " << std::endl;
+        std::cout << " |                          CORNER BEND:                            | "   << std::endl;
+        std::cout << " |                                                                  | " << std::endl;
+        std::cout << " ==================================================================== " << std::endl;
     }
 
 }
 
-
 int main(int argc, char** argv)
 {
+    if (argc != 2)
+    {
+        std::cout << "Please specify command line arg {straight} or {bend}" << std::endl;
+
+    }
     ros::init(argc, argv, "bend_categorization");
     BendDetection bend;
     bend.bend_check = argv[1];

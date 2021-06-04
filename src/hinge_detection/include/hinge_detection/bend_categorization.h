@@ -9,30 +9,6 @@
 
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloudT;
 
-class LengthPoint {
-private:
-    float x_min;
-    float x_max;
-    float y_max;
-
-public:
-    float getXMin() const {
-        return x_min;
-    }
-
-    float getXMax() const {
-        return x_max;
-    }
-
-    float getYMax() const {
-        return y_max;
-    }
-
-    LengthPoint (float xMin, float xMax, float yMax) :  x_min(xMin),
-                                                        x_max(xMax),
-                                                        y_max(yMax) {}
-};
-
 class CloudCoordinates {
 private:
     float x;
@@ -66,17 +42,17 @@ public:
     ros::Subscriber edge_points_sub_;
     std::string frame_id_;
     PointCloudT::Ptr cloud_scene_ptr_;
-    float set_straight_length_;
-    float get_straight_length_;
+    float set_straight_length_{};
+    float get_straight_length_{};
     std::string bend_check;
 
-    void edgePointCb(const sensor_msgs::PointCloud2& cloud_scene);
+    void edgePointCb(const sensor_msgs::PointCloud2 &cloud_scene);
 
     void calculateEdgeLength();
 
-    std::vector<CloudCoordinates> edgePointProcessing(PointCloudT& cloudIn) const;
+    static std::vector<CloudCoordinates> edgePointProcessing(PointCloudT &cloudIn);
 
-    float straightEdge(std::vector<CloudCoordinates> &cloudCoordinates) const;
+    static float straightEdge(std::vector<CloudCoordinates> &cloudCoordinates);
 
     float bendEdge(std::vector<CloudCoordinates> &cloudCoordinates) const;
 

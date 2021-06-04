@@ -8,7 +8,7 @@ EdgeTracking::EdgeTracking() {
 
     package_cloud_publisher_ = node_.advertise<sensor_msgs::PointCloud2>("/edge_cloud", 1);
     package_marker_publisher_ = node_.advertise<visualization_msgs::Marker>("visualization_marker", 1);
-    camera_point_cloud_sub_ = node_.subscribe("two/depth/color/points", 1, &EdgeTracking::pointCloudCb, this);
+    camera_point_cloud_sub_ = node_.subscribe("length/depth/color/points", 1, &EdgeTracking::pointCloudCb, this);
     camera_scene_cloud_ptr_ = PointCloudT::Ptr(new PointCloudT);
     box_filter_cloud_ptr_ = PointCloudT::Ptr(new PointCloudT);
 }
