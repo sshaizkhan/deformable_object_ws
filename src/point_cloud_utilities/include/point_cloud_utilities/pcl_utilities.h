@@ -9,6 +9,7 @@
 /****************************************/
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
+#include "ros/package.h"
 
 /****************************************/
 //          PCL HEADERS
@@ -42,6 +43,11 @@
 #include "pcl/io/openni_grabber.h"
 #include "pcl/octree/octree_search.h"
 #include "pcl/filters/passthrough.h"
+
+/****************************************/
+//          RVIZ HEADERS
+/****************************************/
+#include "visualization_msgs/Marker.h"
 
 /****************************************/
 //          STANDARD HEADERS
@@ -93,13 +99,63 @@ namespace PCLUtilities
     template<typename PointT>
 
     inline void publishPCLToRviz(pcl::PointCloud<PointT>cloudIn, ros::Publisher& pub, std::string& frame_id)
-
     {
-        sensor_msgs::PointCloud2 mesh_cloud_msg;
-        pcl::toROSMsg(cloudIn, mesh_cloud_msg);
-        mesh_cloud_msg.header.frame_id = frame_id;
+        sensor_msgs::PointCloud2 package_cloud_msg;
+        pcl::toROSMsg(cloudIn, package_cloud_msg);
+        package_cloud_msg.header.frame_id = frame_id;
+        package_cloud_msg.header.stamp = ros::Time::now();
         std::cout<<"Mesh to be published has: " << cloudIn.points.size() << std::endl;
-        pub.template publish(mesh_cloud_msg);
+        pub.template publish(package_cloud_msg);
+
+    }
+
+    template<typename PointT>
+    inline void rvizMarkerPublish(pcl::PointCloud<PointT>& cloudIn, ros::Publisher& marker_pub, std::string& frame_id)
+    {
+        visualization_msgs::Marker points, line_strip;
+        points.header.frame_id = line_strip.header.frame_id = frame_id;
+        points.header.stamp = line_strip.header.stamp = ros::Time::now();
+        points.ns = "points";
+        line_strip.ns = "line_strip";
+
+        points.action = line_strip.action = visualization_msgs::Marker::ADD;
+        points.pose.orientation.w = line_strip.pose.orientation.w = 1.0;
+
+        points.id = 0;
+        line_strip.id = 1;
+
+        points.type = visualization_msgs::Marker::POINTS;
+        line_strip.type = visualization_msgs::Marker::LINE_STRIP;
+
+        // POINTS markers use x and y scale for width/height respectively
+        points.scale.x = 0.0008;
+        points.scale.y = 0.0008;
+
+        // LINE_STRIP/LINE_LIST markers use only the x component of scale, for the line width
+        line_strip.scale.x = 0.0004;
+
+        // Points are green
+        points.color.g = 1.0f;
+        points.color.a = 1.0;
+
+        // Line strip is blue
+        line_strip.color.b = 1.0;
+        line_strip.color.a = 1.0;
+
+        for (std::size_t i = 0; i < cloudIn.size(); i++)
+        {
+            geometry_msgs::Point p;
+            p.x = cloudIn.points[i].x;
+            p.y = cloudIn.points[i].y;
+            p.z = cloudIn.points[i].z;
+
+            points.points.push_back(p);
+            line_strip.points.push_back(p);
+
+        }
+
+        marker_pub.template publish(points);
+        marker_pub.template publish(line_strip);
 
     }
 
@@ -148,21 +204,6 @@ namespace PCLUtilities
                                 << " data points from the loaded PLY file" <<std::endl;
 
         return *cloud_out_;
-    }
-
-
-    template<typename PointT>
-    pcl::PointCloud<PointT>outliersRemoval(pcl::PointCloud<PointT> cloud, int meanK, double standDevThresh)
-    {
-        pcl::PointCloud<PointT> cloud_filtered_;
-        pcl::StatisticalOutlierRemoval<PointT> stat_filtered_;
-        stat_filtered_.setInputCloud(cloud.makeShared());
-        stat_filtered_.setMeanK(meanK);
-        stat_filtered_.setStddevMulThresh(standDevThresh);
-        stat_filtered_.filter(cloud_filtered_);
-
-        return cloud_filtered_;
-
     }
 
 

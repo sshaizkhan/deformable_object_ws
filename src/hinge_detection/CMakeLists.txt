@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(package_tracking)
+project(hinge_detection)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -7,26 +7,26 @@ project(package_tracking)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-
 find_package(catkin REQUIRED COMPONENTS
-        pcl_conversions
-        pcl_msgs
-        pcl_ros
-        roscpp
-        rospy
-        sensor_msgs
-        point_cloud_utilities
-        roslib
-        )
-
-find_package(PCL REQUIRED)
-
-
-
+  roscpp
+  roslib
+  std_msgs
+  rospy
+  message_generation
+  pcl_conversions
+  pcl_msgs
+  pcl_ros
+  sensor_msgs
+  package_tracking
+)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
+cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+find_package(PCL 1.8)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -58,11 +58,10 @@ find_package(PCL REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  custom_pc_msg.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -79,10 +78,12 @@ find_package(PCL REQUIRED)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   pcl_msgs#   sensor_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -114,10 +115,10 @@ find_package(PCL REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-        INCLUDE_DIRS include
-        LIBRARIES ${PROJECT_NAME}
-        CATKIN_DEPENDS pcl_conversions pcl_msgs pcl_ros roscpp rospy sensor_msgs point_cloud_utilities
-        #  DEPENDS system_lib
+  INCLUDE_DIRS include
+  LIBRARIES hinge_detection
+  CATKIN_DEPENDS pcl_conversions pcl_msgs pcl_ros roscpp roslib rospy sensor_msgs message_runtime package_tracking
+#  DEPENDS system_lib
 )
 
 ###########
@@ -127,19 +128,19 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-        include
-        ${catkin_INCLUDE_DIRS}
-        ${PCL_INCLUDE_DIRS}
-        ${point_cloud_utilities_INCLUDE_DIRS}
+      include
+      ${catkin_INCLUDE_DIRS}
+      ${PCL_INCLUDE_DIRS}
+      ${package_tracking_INCLUDE_DIRS}
 )
 
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 ## Declare a C++ library
- add_library(${PROJECT_NAME}
-   src/optimized_edge_detection.cpp
- )
+# add_library(${package_tracking}
+#   src/${package_tracking}/optimized_edge_tracking.cpp
+# )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -149,7 +150,7 @@ add_definitions(${PCL_DEFINITIONS})
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/my_pcl_tutorials_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/hinge_detection_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -175,10 +176,9 @@ add_definitions(${PCL_DEFINITIONS})
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-# catkin_install_python(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+catkin_install_python(PROGRAMS scripts/point_cloud.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
@@ -213,7 +213,7 @@ add_definitions(${PCL_DEFINITIONS})
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_my_pcl_tutorials.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_hinge_detection.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
@@ -221,11 +221,5 @@ add_definitions(${PCL_DEFINITIONS})
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(edge_tracking src/package_edge_detection.cpp)
-target_link_libraries(edge_tracking ${catkin_LIBRARIES} ${PCL_LIBRARIES})
-
-add_executable(surface_tracking src/surface_tracking.cpp)
-target_link_libraries(surface_tracking ${catkin_LIBRARIES} ${PCL_LIBRARIES})
-
-add_executable(optimized_edge_tracking src/optimized_edge_detection.cpp)
-target_link_libraries(optimized_edge_tracking ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+add_executable(bend_category src/bend_categorization.cpp)
+target_link_libraries(bend_category ${catkin_LIBRARIES} ${PCL_LIBRARIES})

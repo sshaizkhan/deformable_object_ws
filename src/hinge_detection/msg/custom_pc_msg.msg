@@ -1,0 +1,2 @@
+sensor_msgs/PointCloud2 published_point_cloud
+int32 id

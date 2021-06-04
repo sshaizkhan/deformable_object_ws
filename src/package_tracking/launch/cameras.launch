@@ -1,16 +1,23 @@
 <launch>
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-        <arg name="filters"           default="pointcloud"/>
-        <arg name="camera" value="one"/>
-        <arg name="serial_no" value="935722061157" />
+    <group ns = "camera_width">
+        <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+            <arg name="filters"           default="pointcloud"/>
+            <arg name="camera" value="width"/>
+            <arg name="serial_no" value="023322060732" />
+        </include>
+        <node pkg="tf" type="static_transform_publisher" name="camera_to_world" args="0.0 0.0 0.0 0.0 0.0 0 /world /width_camera_link 30"/>
 
-    </include>
+    </group>
 
 
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-        <arg name="filters"           default="pointcloud"/>
-        <arg name="camera" value="two" />
-        <arg name="serial_no" value="925322061835" />
+    <group ns = "camera_length">
+        <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+            <arg name="filters"           default="pointcloud"/>
+            <arg name="camera" value="length" />
+            <arg name="serial_no" value="935722061157" />
 
-    </include>
+        </include>
+        <node pkg="tf" type="static_transform_publisher" name="camera_to_world" args="0.0 0.0 0.0 0.0 0.0 1.527 /world /length_camera_link 60"/>
+    </group>
+
 </launch>

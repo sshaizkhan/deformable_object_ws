@@ -6,7 +6,7 @@
 #define PACKAGE_TRACKING_OPTIMIZED_EDGE_DETECTION_H
 
 #include "point_cloud_utilities/pcl_utilities.h"
-#include "ros/package.h"
+
 
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloudT;
 
@@ -72,6 +72,7 @@ public:
 
 //  Point cloud tracking members
     ros::Publisher package_cloud_publisher_;
+    ros::Publisher package_marker_publisher_;
     std::vector<double> camera_box_limits_;
     PointCloudT::Ptr box_filter_cloud_ptr_;
 

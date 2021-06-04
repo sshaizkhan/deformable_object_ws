@@ -1,5 +1,5 @@
 //
-// Created by shahwaz on 3/5/21.
+// Created by shahwazk@usc.edu on 3/5/21.
 //
 
 #include "package_tracking/optimized_edge_detection.h"
@@ -7,7 +7,8 @@
 EdgeTracking::EdgeTracking() {
 
     package_cloud_publisher_ = node_.advertise<sensor_msgs::PointCloud2>("/edge_cloud", 1);
-    camera_point_cloud_sub_ = node_.subscribe("two/depth/color/points", 1, &EdgeTracking::pointCloudCb, this);
+    package_marker_publisher_ = node_.advertise<visualization_msgs::Marker>("visualization_marker", 1);
+    camera_point_cloud_sub_ = node_.subscribe("length/depth/color/points", 1, &EdgeTracking::pointCloudCb, this);
     camera_scene_cloud_ptr_ = PointCloudT::Ptr(new PointCloudT);
     box_filter_cloud_ptr_ = PointCloudT::Ptr(new PointCloudT);
 }
@@ -27,8 +28,10 @@ void EdgeTracking::optimizedTrackEdge() {
     const vector<EdgePoint> &obj_edges = finalEdgeTracking(point_cloud_vector, z_tolerance);
     *final_cloud_ = buildCloud(obj_edges);
 //    *euclidean_point_cloud_ = PCLUtilities::euclideanClustering(final_cloud_, ec_tolerance, minClusterSize, maxClusterSize);
-    PCLUtilities::publishPCLToRviz(*final_cloud_, package_cloud_publisher_, frame_id_);
-//    PCLUtilities::savePointCloudToPCD(buildCloud(obj_edges), file_path_, "hash_maped.pcd");
+    PCLUtilities::publishPCLToRviz(PCLUtilities::statisticalOutlierRemoval(*final_cloud_, 1, 0.000001), package_cloud_publisher_, frame_id_);
+//    PCLUtilities::publishPCLToRviz(*final_cloud_, package_cloud_publisher_, frame_id_);
+    PCLUtilities::rvizMarkerPublish(*final_cloud_, package_marker_publisher_, frame_id_);
+    PCLUtilities::savePointCloudToPLY(buildCloud(obj_edges), file_path_, "P1.ply");
     std::cout << "Publishing to RViz...." << std::endl;
 }
 
@@ -57,7 +60,7 @@ std::vector<Coordinate> EdgeTracking::cloudProcessing(PointCloudT &cloudIn) {
 std::vector<EdgePoint> EdgeTracking::finalEdgeTracking(const std::vector<Coordinate> &coordinates, float &z_tolerance) {
 //    std::unordered_map<float, std::vector<std::pair<float,float>>> x_coordinate_map_;
     std::unordered_map<float, std::vector<std::pair<float, float>>> x_coordinate_map_;
-    std::cout << "input coordinate has size : " << coordinates.size() << std::endl;
+    std::cout << "Input coordinate has size : " << coordinates.size() << std::endl;
 
     for (auto coordinate : coordinates) {
         x_coordinate_map_[coordinate.getX()].push_back(std::make_pair(coordinate.getZ(), coordinate.getY()));
@@ -71,21 +74,6 @@ std::vector<EdgePoint> EdgeTracking::finalEdgeTracking(const std::vector<Coordin
         EdgePoint edgePoint(it.first, it.second[0].first, it.second[0].second);
         result.push_back(edgePoint);
     }
-//
-//    std::vector<EdgePoint> result;
-//    for (auto &it : x_coordinate_map_) {
-//
-//        sort(it.second.begin(), it.second.end());
-//        float tolerance = it.second[0].first + z_tolerance;
-//        for (auto it_z: it.second) {
-//            if (it_z.first <= tolerance) {
-////                std::cout << "z_min: " << it_z.first << std::endl;
-//                EdgePoint edgePoint(it.first, it_z.first, it_z.second);
-//                result.push_back(edgePoint);
-//            } else
-//                continue;
-//        }
-//    }
     return result;
 }
 
@@ -99,7 +87,7 @@ pcl::PointCloud<pcl::PointXYZ> EdgeTracking::buildCloud(const std::vector<EdgePo
 
     for (std::size_t i = 0; i < edgePoints.size(); i++) {
         final_point_cloud_->points[i].x = edgePoints[i].getXCoordinate();
-        final_point_cloud_->points[i].z = edgePoints[i].getMinZCoordinate();
+        final_point_cloud_->points[i].z = 0;
         final_point_cloud_->points[i].y = edgePoints[i].getCorrespondingY();
     }
     std::cout << "PointCloud after creating from vectors has : " << final_point_cloud_->points.size()
